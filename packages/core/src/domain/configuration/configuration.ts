@@ -2,7 +2,7 @@ import type { CookieOptions } from '../../browser/cookie'
 import { getCurrentSite } from '../../browser/cookie'
 import { catchUserErrors } from '../../tools/catchUserErrors'
 import { display } from '../../tools/display'
-import { assign, isPercentage, objectHasValue, ONE_KIBI_BYTE, ONE_SECOND } from '../../tools/utils'
+import { assign, isNumber, isPercentage, objectHasValue, ONE_KIBI_BYTE, ONE_SECOND } from '../../tools/utils'
 import type { RawTelemetryConfiguration } from '../telemetry'
 import { ExperimentalFeature, addExperimentalFeatures } from './experimentalFeatures'
 import type { TransportConfiguration } from './transportConfiguration'
@@ -54,6 +54,8 @@ export interface InitConfiguration {
   internalAnalyticsSubdomain?: string
 
   telemetryConfigurationSampleRate?: number
+
+  flushTimeout?: number
 }
 
 // This type is only used to build the core configuration. Logs and RUM SDKs are using a proper type
@@ -111,6 +113,11 @@ export function validateAndBuildConfiguration(initConfiguration: InitConfigurati
     return
   }
 
+  if (initConfiguration.flushTimeout !== undefined && !isNumber(initConfiguration.flushTimeout)) {
+    display.error('Flush Timeout should be a number')
+    return
+  }
+
   // Set the experimental feature flags as early as possible, so we can use them in most places
   if (Array.isArray(initConfiguration.enableExperimentalFeatures)) {
     addExperimentalFeatures(
@@ -144,7 +151,7 @@ export function validateAndBuildConfiguration(initConfiguration: InitConfigurati
        * flush automatically, aim to be lower than ALB connection timeout
        * to maximize connection reuse.
        */
-      flushTimeout: 30 * ONE_SECOND,
+      flushTimeout: (initConfiguration.flushTimeout ?? 30) * ONE_SECOND,
 
       /**
        * Logs intake limit
