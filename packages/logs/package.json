@@ -1,6 +1,6 @@
 {
   "name": "@datadog/browser-logs",
-  "version": "4.37.0",
+  "version": "4.37.1",
   "license": "Apache-2.0",
   "main": "cjs/entries/main.js",
   "module": "esm/entries/main.js",
@@ -13,7 +13,7 @@
     "replace-build-env": "node ../../scripts/build/replace-build-env.js"
   },
   "dependencies": {
-    "@datadog/browser-core": "4.37.0"
+    "@datadog/browser-core": "https://github.com/Nirovision/browser-sdk/raw/release/patched/packages/core/datadog-browser-core-4.37.1.tgz"
   },
   "peerDependencies": {
     "@datadog/browser-rum": "4.37.0"
